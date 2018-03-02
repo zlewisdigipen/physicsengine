@@ -8,6 +8,7 @@ enum ColliderType
 {
 	SphereType,
 	AABBType,
+  CylinderType,
 	PlaneType,
 	NumberOfColliderType
 };

@@ -26,7 +26,8 @@ int main()
   Cube c(c_radius);
 
   //Cylinder stuff
-  Cylinder cy(0.65f, 0.75f, 16);
+  float cy_height = 0.65f;
+  Cylinder cy(cy_height, 0.75f, 16);
 
   //Plane stuff
   Plane p(15.0f);
@@ -42,14 +43,14 @@ int main()
 
   std::vector<Entity> entity_list;
   entity_list.push_back(Entity(&cube_mesh, Transform(glm::vec3(2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius), glm::vec3(0.0f, 0.0f, -1.0f))));
-  entity_list.push_back(Entity(&sphere_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(-1.0f, 0.0f, -1.0f), s_radius)));
+  //entity_list.push_back(Entity(&sphere_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(-1.0f, 0.0f, -1.0f), s_radius)));
   entity_list.push_back(Entity(&sphere_mesh, Transform(glm::vec3(0.0f, 0.0f, -1.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(1.0f, 0.0f, -1.0f), s_radius)));
-  //entity_list.push_back(Entity(&cylinder_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), new SphereCollider(glm::vec3(1.0f, 0.0f, -1.0f), s_radius)));
+  entity_list.push_back(Entity(&cylinder_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), new CylinderCollider(glm::vec3(-2.0f, 0.0f, 0.0f), cy_height, s_radius)));
   entity_list.push_back(Entity(&plane_mesh, Transform(glm::vec3(0.0f, -3.0f, 0.0f)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), new PlaneCollider(glm::vec3(0.0f, 1.0f, 0.0f), -3.0f)));
 
   //For stress test
-  /*
-  for (int i = 0; i < 20; i++)
+  
+  /*for (int i = 0; i < 10; i++)
   {
     for (int j = 0; j < 10; j++)
     {

@@ -1,9 +1,10 @@
 #include "physics.h"
 #include <iostream>
 
-FuncType detection_lookup[ColliderType::NumberOfColliderType][ColliderType::NumberOfColliderType] = {{ SphereSphere, SphereAABB, SpherePlane },
-                                                                                                     { SphereAABB,   AABBAABB,   AABBPlane },
-                                                                                                     { SpherePlane,  AABBPlane,  0 }};
+FuncType detection_lookup[ColliderType::NumberOfColliderType][ColliderType::NumberOfColliderType] = {{ SphereSphere,   SphereAABB,   CylinderSphere,   SpherePlane },
+                                                                                                     { SphereAABB,     AABBAABB,     CylinderAABB,     AABBPlane },
+                                                                                                     { CylinderSphere, CylinderAABB, CylinderCylinder, CylinderPlane},
+                                                                                                     { SpherePlane,    AABBPlane,    CylinderPlane,    0 }};
 
 void Physics_Update(std::vector<Entity> entity_list)
 {
@@ -90,7 +91,6 @@ bool SphereAABB(const Collider* c1, const Collider* c2)
   return false;
 }
 
-
 IntersectionType PointPlane(glm::vec3 a, const PlaneCollider b, float epsilon)
 {
   //PlaneCollider plane = b.Normalized();
@@ -167,4 +167,34 @@ bool AABBAABB(const Collider* c1, const Collider* c2)
   }
 
   return true;
+}
+
+bool CylinderSphere(const Collider* c1, const Collider* c2)
+{
+  CylinderCollider* a = (CylinderCollider*)(c1);
+  SphereCollider* b = (SphereCollider*)(c2);
+
+  return false;
+}
+
+bool CylinderAABB(const Collider* c1, const Collider* c2)
+{
+  CylinderCollider* a = (CylinderCollider*)(c1);
+  AABBCollider* b = (AABBCollider*)(c2);
+  return false;
+}
+
+bool CylinderPlane(const Collider* c1, const Collider* c2)
+{
+  CylinderCollider* a = (CylinderCollider*)(c1);
+  PlaneCollider* b = (PlaneCollider*)(c2);
+  return false;
+}
+
+bool CylinderCylinder(const Collider* c1, const Collider* c2)
+{
+  CylinderCollider* a = (CylinderCollider*)(c1);
+  CylinderCollider* b = (CylinderCollider*)(c2);
+  return false;
+
 }

@@ -1,3 +1,9 @@
-﻿  main.cpp
-  PhysicsEngine.vcxproj -> C:\Users\z.lewis\Desktop\3Dphysics\PhysicsEngine\Debug\PhysicsEngine.exe
-  PhysicsEngine.vcxproj -> C:\Users\z.lewis\Desktop\3Dphysics\PhysicsEngine\Debug\PhysicsEngine.pdb (Full PDB)
+﻿  shader.cpp
+  physics.cpp
+  mesh.cpp
+  main.cpp
+  graphics.cpp
+  display.cpp
+  Generating Code...
+  PhysicsEngine.vcxproj -> C:\Users\Zach\Desktop\physicsengine\physicsengine\3Dphysics\PhysicsEngine\Debug\PhysicsEngine.exe
+  PhysicsEngine.vcxproj -> C:\Users\Zach\Desktop\physicsengine\physicsengine\3Dphysics\PhysicsEngine\Debug\PhysicsEngine.pdb (Full PDB)

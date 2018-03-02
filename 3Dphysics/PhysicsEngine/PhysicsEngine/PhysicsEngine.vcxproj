@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="aabb_collider.h" />
     <ClInclude Include="collider.h" />
+    <ClInclude Include="cylinder_collider.h" />
     <ClInclude Include="physics.h" />
     <ClInclude Include="sphere_collider.h" />
     <ClInclude Include="camera.h" />
