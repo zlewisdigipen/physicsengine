@@ -18,6 +18,11 @@ public:
 	  m_collider = collider;
   }
 
+  ~Entity()
+  {
+    delete m_collider;
+  }
+
   Transform& GetTransform() { return m_transform; }
   Mesh* GetMesh() { return m_mesh; }
   glm::vec4& GetColor() { return m_color; }

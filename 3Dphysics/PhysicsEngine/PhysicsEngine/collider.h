@@ -18,6 +18,7 @@ class Collider
 public:
 	Collider() {}
 	//Collider(const ColliderType t) : type(t) {}
+  virtual ~Collider() {}
 
 	const ColliderType GetType() const { return type; }
   glm::vec3& GetPos() { return pos; }

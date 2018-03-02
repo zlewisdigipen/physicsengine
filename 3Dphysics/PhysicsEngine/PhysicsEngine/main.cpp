@@ -1,3 +1,8 @@
+/*
+#define _CRTDBG_MAP_ALLOC  
+#include <stdlib.h>  
+#include <crtdbg.h>
+*/
 #include <iostream>
 #include <GL/glew.h>
 #include "display.h"
@@ -12,11 +17,25 @@
 #include "entity.h"
 #include "graphics.h"
 #include "physics.h"
+#include <time.h>
 
 #undef main
 
+/*
+void OnExit()
+{
+  freopen("dumpleak/log.txt", "w", stdout);
+  _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+  _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+  _CrtDumpMemoryLeaks();
+  fclose(stdout);
+}*/
+
 int main()
 {
+  //For memory leak checking V put that infront of news
+  //atexit(OnExit); (_NORMAL_BLOCK, __FILE__, __LINE__) 
+
   //Sphere stuff
 	float s_radius = 0.75f;
   Sphere s(.5f, s_radius, .0f);
@@ -41,21 +60,20 @@ int main()
   Mesh cylinder_mesh(&(cy.GetVertices()[0]), cy.GetVertices().size(), &(cy.GetIndices()[0]), cy.GetIndices().size());
   Mesh plane_mesh(&(p.GetVertices()[0]), p.GetVertices().size(), &(p.GetIndices()[0]), p.GetIndices().size());
 
-  std::vector<Entity> entity_list;
-  entity_list.push_back(Entity(&cube_mesh, Transform(glm::vec3(2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius), glm::vec3(0.0f, 0.0f, -1.0f))));
-  //entity_list.push_back(Entity(&sphere_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(-1.0f, 0.0f, -1.0f), s_radius)));
-  entity_list.push_back(Entity(&sphere_mesh, Transform(glm::vec3(0.0f, 0.0f, -1.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(1.0f, 0.0f, -1.0f), s_radius)));
-  entity_list.push_back(Entity(&cylinder_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), new CylinderCollider(glm::vec3(-2.0f, 0.0f, 0.0f), cy_height, s_radius)));
-  entity_list.push_back(Entity(&plane_mesh, Transform(glm::vec3(0.0f, -3.0f, 0.0f)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), new PlaneCollider(glm::vec3(0.0f, 1.0f, 0.0f), -3.0f)));
+  std::vector<Entity*> entity_list;
+  entity_list.push_back(new Entity(&cube_mesh, Transform(glm::vec3(2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius), glm::vec3(0.0f, 0.0f, -1.0f))));
+  entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(0.0f, 0.0f, -1.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(1.0f, 0.0f, -1.0f), s_radius)));
+  //entity_list.push_back(new Entity(&cylinder_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), new CylinderCollider(glm::vec3(-2.0f, 0.0f, 0.0f), cy_height, s_radius)));
+  //entity_list.push_back(new Entity(&plane_mesh, Transform(glm::vec3(0.0f, -3.0f, 0.0f)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), new PlaneCollider(glm::vec3(0.0f, 1.0f, 0.0f), -3.0f)));
 
   //For stress test
-  
-  /*for (int i = 0; i < 10; i++)
+  /*
+  for (int i = 0; i < 15; i++)
   {
     for (int j = 0; j < 10; j++)
     {
-      //entity_list.push_back(Entity(&cube_mesh, Transform(glm::vec3(-2.0f * i, 0.0f, 2.0f*j)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius), glm::vec3(-2.0f * i, 0.0f, 2.0f*j))));
-      //entity_list.push_back(Entity(&sphere_mesh, Transform(glm::vec3(-2.0f * i, 0.0f, 2.0f*j)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(-1.0f, 0.0f, -1.0f), s_radius)));
+      //entity_list.push_back(new Entity(&cube_mesh, Transform(glm::vec3(-2.0f * i, 0.0f, 2.0f*j)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius), glm::vec3(-2.0f * i, 0.0f, 2.0f*j))));
+      entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(-2.0f * i, 0.0f, 2.0f*j)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(-1.0f, 0.0f, -1.0f), s_radius)));
     }
   }*/
 
@@ -64,13 +82,19 @@ int main()
   if (SDL_SetRelativeMouseMode(SDL_TRUE))
     std::cout << SDL_GetError() << std::endl;
 
-  int framecount = 0;
-  
+  uint32_t current_tick = 0, last_tick = 0;
+  float  dt = 0.0f;
 
   while (!display.Closed())
   {
-    //Clear frame
+    //Get dt
+    current_tick = SDL_GetTicks();
+    dt = (float)(current_tick - last_tick) / 1000.f;
+    last_tick = current_tick;
+    std::cout << "FPS: " << 1.0f / (dt) << std::endl;
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //Clear frame
     display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
 
 	/*
@@ -84,11 +108,6 @@ int main()
 
     //Updating the display
     display.SwapBuffer();
-    uint32_t ticks = SDL_GetTicks();
-    framecount++;
-
-    std::cout << "FPS: " << (float)framecount / ((float)ticks / 1000.0f) << std::endl;
-
 
 
     //Check for input
@@ -128,6 +147,10 @@ int main()
       }
     }
   }
+
+  //delete all the data
+  for (unsigned i = 0; i < entity_list.size(); i++)
+    delete entity_list[i];
 
   return 0;
 }

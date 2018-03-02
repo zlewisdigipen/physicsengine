@@ -31,7 +31,7 @@ bool CylinderAABB(const Collider* a, const Collider* b);
 bool CylinderPlane(const Collider* a, const Collider* b);
 bool CylinderCylinder(const Collider* a, const Collider* b);
 
-void Physics_Update(std::vector<Entity> entity_list);
+void Physics_Update(std::vector<Entity*>& entity_list);
 
 #endif // !PHYSICS_H
 

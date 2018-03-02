@@ -6,19 +6,19 @@ FuncType detection_lookup[ColliderType::NumberOfColliderType][ColliderType::Numb
                                                                                                      { CylinderSphere, CylinderAABB, CylinderCylinder, CylinderPlane},
                                                                                                      { SpherePlane,    AABBPlane,    CylinderPlane,    0 }};
 
-void Physics_Update(std::vector<Entity> entity_list)
+void Physics_Update(std::vector<Entity*>& entity_list)
 {
   //Update transforms
   for (unsigned i = 0; i < entity_list.size(); i++)
-    entity_list[i].GetCollider()->UpdateCollider(entity_list[i].GetTransform());
+    (*entity_list[i]).GetCollider()->UpdateCollider((*entity_list[i]).GetTransform());
 
   //Collision Detection and update colliders
   for (unsigned i = 0; i < entity_list.size(); i++)
   {
     for (unsigned j = i + 1; j < entity_list.size(); j++)
     {
-      const Collider* c1 = entity_list[i].GetCollider();
-      const Collider* c2 = entity_list[j].GetCollider();
+      const Collider* c1 = (*entity_list[i]).GetCollider();
+      const Collider* c2 = (*entity_list[j]).GetCollider();
 
       if (c1->GetType() < c2->GetType())
       {

@@ -8,6 +8,6 @@
 #include <vector>
 
 //void Graphics_Init();
-void Graphics_Update(std::vector<Entity>& entity_list, Camera& camera, Shader& shader);
+void Graphics_Update(std::vector<Entity*>& entity_list, Camera& camera, Shader& shader);
 
 #endif // !GRAPHICS_H
