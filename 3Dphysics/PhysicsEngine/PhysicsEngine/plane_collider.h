@@ -10,7 +10,6 @@ class PlaneCollider : public Collider
 public:
 	PlaneCollider(const glm::vec3 n, const float d) : normal(n), distance(d) 
   {
-    pos = n * d;
     type = ColliderType::PlaneType; 
   }
 
@@ -23,9 +22,9 @@ public:
 	const glm::vec3 GetNormal() const { return normal; }
 	const float GetDistance() const { return distance; }
 
-  void UpdateCollider(Transform t) 
+  void UpdateCollider(Transform* t) 
   {
-    
+    tran = t;
   }
 
 private:

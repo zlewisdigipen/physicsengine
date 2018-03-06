@@ -8,15 +8,14 @@
 class SphereCollider: public Collider
 {
 public:
-	SphereCollider(const glm::vec3 c, const float r): radius(r) 
+	SphereCollider(const float r): radius(r) 
   { 
-    pos = c;
     type = ColliderType::SphereType; 
   }
 
 	const float GetRadius() const { return radius; }
 
-  void UpdateCollider(Transform t) { pos = t.GetPos(); }
+  void UpdateCollider(Transform* t) { tran = t; }
 
 private:
 	const float radius;

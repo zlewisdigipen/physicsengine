@@ -61,10 +61,12 @@ int main()
   Mesh plane_mesh(&(p.GetVertices()[0]), p.GetVertices().size(), &(p.GetIndices()[0]), p.GetIndices().size());
 
   std::vector<Entity*> entity_list;
-  entity_list.push_back(new Entity(&cube_mesh, Transform(glm::vec3(2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius), glm::vec3(0.0f, 0.0f, -1.0f))));
-  entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(0.0f, 0.0f, -1.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(1.0f, 0.0f, -1.0f), s_radius)));
+
+  //entity_list.push_back(new Entity(&cube_mesh, Transform(glm::vec3(2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius), glm::vec3(0.0f, 0.0f, -1.0f))));
   //entity_list.push_back(new Entity(&cylinder_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), new CylinderCollider(glm::vec3(-2.0f, 0.0f, 0.0f), cy_height, s_radius)));
-  //entity_list.push_back(new Entity(&plane_mesh, Transform(glm::vec3(0.0f, -3.0f, 0.0f)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), new PlaneCollider(glm::vec3(0.0f, 1.0f, 0.0f), -3.0f)));
+  entity_list.push_back(new Entity(&plane_mesh, Transform(glm::vec3(0.0f, -3.0f, 0.0f)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), new PlaneCollider(glm::vec3(0.0f, 1.0f, 0.0f), -3.0f)));
+  entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(2.0f, 5.0f, -1.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(s_radius)));
+  //entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(-2.0f, 0.0f, -1.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(s_radius)));
 
   //For stress test
   /*
@@ -76,14 +78,24 @@ int main()
       entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(-2.0f * i, 0.0f, 2.0f*j)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(-1.0f, 0.0f, -1.0f), s_radius)));
     }
   }*/
+	/*
+    entity_list[0].GetTransform().GetRot() = glm::angleAxis(-counter, glm::normalize(glm::vec3(0.5f, 1.0f, 0.0f)));
+    entity_list[1].GetTransform().GetRot() = glm::angleAxis(counter, glm::normalize(glm::vec3(0.5f, 1.0f, 0.0f)));
+    entity_list[2].GetTransform().GetRot() = glm::angleAxis(counter, glm::normalize(glm::vec3(0.0f, 1.0f, 1.0f)));
+	*/
 
   shader.Bind();
 
   if (SDL_SetRelativeMouseMode(SDL_TRUE))
     std::cout << SDL_GetError() << std::endl;
 
+  //Frames stuff
   uint32_t current_tick = 0, last_tick = 0;
   float  dt = 0.0f;
+
+  entity_list[1]->GetCollider()->GetRigibody().GetStatic() = false;
+  entity_list[1]->GetCollider()->GetRigibody().GetDirection() = glm::vec3(0.0f, -1.0f, 0.0f);
+  entity_list[1]->GetCollider()->GetRigibody().GetSpeed() = 0.05f;
 
   while (!display.Closed())
   {
@@ -97,14 +109,8 @@ int main()
     //Clear frame
     display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
 
-	/*
-    entity_list[0].GetTransform().GetRot() = glm::angleAxis(-counter, glm::normalize(glm::vec3(0.5f, 1.0f, 0.0f)));
-    entity_list[1].GetTransform().GetRot() = glm::angleAxis(counter, glm::normalize(glm::vec3(0.5f, 1.0f, 0.0f)));
-    entity_list[2].GetTransform().GetRot() = glm::angleAxis(counter, glm::normalize(glm::vec3(0.0f, 1.0f, 1.0f)));
-	*/
-
-    Graphics_Update(entity_list, camera, shader);
     Physics_Update(entity_list);
+    Graphics_Update(entity_list, camera, shader);
 
     //Updating the display
     display.SwapBuffer();
@@ -133,6 +139,18 @@ int main()
         case SDLK_d:
           camera.GetPos() += -glm::cross(camera.GetForward(), camera.GetUp()) * 0.05f;
           break;
+          
+          /*
+        case SDLK_l:
+          entity_list[0]->GetCollider()->GetRigibody().GetDirection() += glm::vec3(0.1f, 0.0f, 0.0f);
+          entity_list[0]->GetCollider()->GetRigibody().GetSpeed() += 1;
+          break;
+        case SDLK_j:
+          entity_list[0]->GetCollider()->GetRigibody().GetDirection() += glm::vec3(-0.1f, 0.0f, 0.0f);
+          entity_list[0]->GetCollider()->GetRigibody().GetSpeed() += 1;
+          break;
+          */
+
         case SDLK_ESCAPE:
           display.SetClosed(true);
           break;

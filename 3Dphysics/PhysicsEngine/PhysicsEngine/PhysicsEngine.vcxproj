@@ -145,6 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="collision_detection.cpp" />
+    <ClCompile Include="collision_response.cpp" />
     <ClCompile Include="display.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="main.cpp" />
@@ -155,8 +157,11 @@
   <ItemGroup>
     <ClInclude Include="aabb_collider.h" />
     <ClInclude Include="collider.h" />
+    <ClInclude Include="collision_detection.h" />
+    <ClInclude Include="collision_response.h" />
     <ClInclude Include="cylinder_collider.h" />
     <ClInclude Include="physics.h" />
+    <ClInclude Include="rigidbody.h" />
     <ClInclude Include="sphere_collider.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="sphere.h" />

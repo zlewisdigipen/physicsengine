@@ -3,6 +3,7 @@
 #define COLLIDER_H
 
 #include "transform.h"
+#include "rigidbody.h"
 
 enum ColliderType
 {
@@ -21,13 +22,15 @@ public:
   virtual ~Collider() {}
 
 	const ColliderType GetType() const { return type; }
-  glm::vec3& GetPos() { return pos; }
+  Transform* GetTransform() { return tran; }
+  Rigibody& GetRigibody() { return rig; }
 
-  virtual void UpdateCollider(Transform t) {}
+  virtual void UpdateCollider(Transform* t) {}
 
 protected:
 	ColliderType type;
-  glm::vec3 pos;
+  Transform* tran;
+  Rigibody rig;
 };
 
 #endif

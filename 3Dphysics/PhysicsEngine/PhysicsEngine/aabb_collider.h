@@ -8,25 +8,22 @@
 class AABBCollider : public Collider
 {
 public:
-  AABBCollider(const glm::vec3 h_e, const glm::vec3 p)
+  AABBCollider(const glm::vec3 h_e)
   {
-    pos = p;
     type = ColliderType::AABBType;
 
     half_ext = glm::abs(h_e);
-    aabb_max = pos + half_ext;
-    aabb_min = pos - (aabb_max - pos);
   }
 
   glm::vec3& GetHalf() { return half_ext; }
   const glm::vec3 GetMin() const { return aabb_min; }
   const glm::vec3 GetMax() const { return aabb_max; }
 
-  void UpdateCollider(Transform t)
+  void UpdateCollider(Transform* t)
   {
-    pos = t.GetPos();
-    aabb_max = pos + half_ext;
-    aabb_min = pos - (aabb_max - pos);
+    tran = t;
+    aabb_max = t->GetPos() + half_ext;
+    aabb_min = t->GetPos() - (aabb_max - t->GetPos());
   }
 
 private:
