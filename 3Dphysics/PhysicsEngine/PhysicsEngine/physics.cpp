@@ -16,15 +16,18 @@ void Physics_Update(std::vector<Entity*>& entity_list)
   //Update colliders here
   for (unsigned i = 0; i < entity_list.size(); i++)
   {
+    /*
     if (!entity_list[i]->GetCollider()->GetRigibody().GetStatic())
     {
       entity_list[i]->GetTransform().GetPos() += glm::normalize(entity_list[i]->GetCollider()->GetRigibody().GetDirection()) *
                                                                 entity_list[i]->GetCollider()->GetRigibody().GetSpeed();
       //entity_list[i]->GetCollider()->GetRigibody().GetDirection() += glm::vec3(0.0f, -0.001f, 0.0f);
-    }
+    }*/
 
     entity_list[i]->GetCollider()->UpdateCollider(&(entity_list[i])->GetTransform());
   }
+
+  std::vector<Manifold> manifolds;
 
   //Collision Detection and update colliders
   for (unsigned i = 0; i < entity_list.size(); i++)
@@ -36,22 +39,27 @@ void Physics_Update(std::vector<Entity*>& entity_list)
 
       if (c1->GetType() < c2->GetType())
       {
-        if (detection_lookup[c1->GetType()][c2->GetType()](c1, c2))
+        Manifold m = detection_lookup[c1->GetType()][c2->GetType()](c1, c2);
+        if (m.contact_count > 0)
         {
-          //std::cout << "Colliding" << std::endl;
-          response_lookup[c1->GetType()][c2->GetType()](c1, c2);
+          //std::cout << m.contacts[0].pen_depth << std::endl;
+          manifolds.push_back(m);
+          //response_lookup[c1->GetType()][c2->GetType()](c1, c2);
         }
-
       }
       else
       {
-        if (detection_lookup[c1->GetType()][c2->GetType()](c2, c1))
+        Manifold m = detection_lookup[c1->GetType()][c2->GetType()](c2, c1);
+        if (m.contact_count > 0)
         {
-          //std::cout << "Colliding" << std::endl;
-          response_lookup[c1->GetType()][c2->GetType()](c2, c1);
+          //std::cout << m.contacts[0].pen_depth << std::endl;
+          manifolds.push_back(m);
+          //response_lookup[c1->GetType()][c2->GetType()](c2, c1);
         }
       }
     }
   }
+
+  //Last loop for manifold resolutions
 }
 

@@ -1,22 +1,50 @@
 #include "collision_detection.h"
 
-bool CD_SphereSphere(const Collider* c1, const Collider* c2)
+//Manifold Done
+Manifold CD_SphereSphere(const Collider* c1, const Collider* c2)
 {
+  Manifold m;
   SphereCollider* a = (SphereCollider*)(c1);
   SphereCollider* b = (SphereCollider*)(c2);
 
-  glm::vec3 temp = a->GetTransform()->GetPos() - b->GetTransform()->GetPos();
+  m.c1 = c1;
+  m.c2 = c2;
+
+  glm::vec3 t = a->GetTransform()->GetPos() - b->GetTransform()->GetPos();
   float rad = a->GetRadius() + b->GetRadius();
 
 
-  if (glm::dot(temp, temp) - (rad * rad) <= 0)
-    return true;
+  if (glm::dot(t, t) > (rad * rad))
+  {
+    m.contact_count = 0;
+    return m; //false
+  }
 
-  return false;
+  float d = glm::length(t);
+
+  //If they are on top of eachother
+  if (d == 0.0f)
+  {
+    m.contacts[0].pen_depth = a->GetRadius();
+    m.contacts[0].normal = glm::vec3(1.0f, 0.0f, 0.0f);
+    m.contacts[0].contact_point = a->GetTransform()->GetPos();
+    m.contact_count = 1;
+  }
+  else
+  {
+    m.contacts[0].pen_depth = rad - d;
+    m.contacts[0].normal = t / d;
+    m.contacts[0].contact_point = m.contacts[0].normal * a->GetRadius() + a->GetTransform()->GetPos();
+    m.contact_count = 1;
+  }
+
+  return m; //true
 }
 
-bool CD_SphereAABB(const Collider* c1, const Collider* c2)
+//
+Manifold CD_SphereAABB(const Collider* c1, const Collider* c2)
 {
+  Manifold m;
   SphereCollider* a = (SphereCollider*)(c1);
   AABBCollider* b = (AABBCollider*)(c2);
 
@@ -46,14 +74,17 @@ bool CD_SphereAABB(const Collider* c1, const Collider* c2)
   // Squared distance
   float sq = 0.0f;
 
-  sq += check(a->GetTransform()->GetPos().x, b->GetMin().x, b->GetMax().x);
-  sq += check(a->GetTransform()->GetPos().y, b->GetMin().y, b->GetMax().y);
-  sq += check(a->GetTransform()->GetPos().z, b->GetMin().z, b->GetMax().z);
+  //Rotate the sphere about the box
+  glm::vec3 rotated_a = (b->GetTransform()->GetRot() * (a->GetTransform()->GetPos() - b->GetTransform()->GetPos())) + b->GetTransform()->GetPos();
+
+  sq += check(rotated_a.x, b->GetMin().x, b->GetMax().x);
+  sq += check(rotated_a.y, b->GetMin().y, b->GetMax().y);
+  sq += check(rotated_a.z, b->GetMin().z, b->GetMax().z);
 
   if (sq - (a->GetRadius() * a->GetRadius()) <= 0.0f)
-    return true;
+    return m; //true
 
-  return false;
+  return m; //false
 }
 
 IntersectionType PointPlane(glm::vec3 a, const PlaneCollider b, float epsilon)
@@ -70,21 +101,25 @@ IntersectionType PointPlane(glm::vec3 a, const PlaneCollider b, float epsilon)
   return IntersectionType::Outside;
 }
 
-bool CD_SpherePlane(const Collider* c1, const Collider* c2)
+Manifold CD_SpherePlane(const Collider* c1, const Collider* c2)
 {
+  Manifold m;
   SphereCollider* a = (SphereCollider*)(c1);
   PlaneCollider* b = (PlaneCollider*)(c2);
 
   IntersectionType t = PointPlane(a->GetTransform()->GetPos(), *b, a->GetRadius());
 
   if (t == IntersectionType::Coplanar)
-    return true;
+  {
+    return m; //true
+  }
 
-  return false;
+  return m; //false
 }
 
-bool CD_AABBPlane(const Collider* c1, const Collider* c2)
+Manifold CD_AABBPlane(const Collider* c1, const Collider* c2)
 {
+  Manifold m;
   AABBCollider* a = (AABBCollider*)(c1);
   PlaneCollider* b = (PlaneCollider*)(c2);
 
@@ -110,13 +145,14 @@ bool CD_AABBPlane(const Collider* c1, const Collider* c2)
   if ((furthest_val == IntersectionType::Inside && nearest_val == IntersectionType::Outside) ||
     (furthest_val == IntersectionType::Outside && nearest_val == IntersectionType::Inside) ||
     furthest_val == IntersectionType::Coplanar || nearest_val == IntersectionType::Coplanar)
-    return true;
+    return m; //true
 
-  return false;
+  return m; //false
 }
 
-bool CD_AABBAABB(const Collider* c1, const Collider* c2)
+Manifold CD_AABBAABB(const Collider* c1, const Collider* c2)
 {
+  Manifold m;
   AABBCollider* a = (AABBCollider*)(c1);
   AABBCollider* b = (AABBCollider*)(c2);
 
@@ -128,38 +164,42 @@ bool CD_AABBAABB(const Collider* c1, const Collider* c2)
     a->GetMin().z > b->GetMax().z ||
     b->GetMin().z > a->GetMax().z)
   {
-    return false;
+    return m; //false
   }
 
-  return true;
+  return m; //true
 }
 
-bool CD_CylinderSphere(const Collider* c1, const Collider* c2)
+Manifold CD_CylinderSphere(const Collider* c1, const Collider* c2)
 {
+  Manifold m;
   CylinderCollider* a = (CylinderCollider*)(c1);
   SphereCollider* b = (SphereCollider*)(c2);
 
-  return false;
+  return m;
 }
 
-bool CD_CylinderAABB(const Collider* c1, const Collider* c2)
+Manifold CD_CylinderAABB(const Collider* c1, const Collider* c2)
 {
+  Manifold m;
   CylinderCollider* a = (CylinderCollider*)(c1);
   AABBCollider* b = (AABBCollider*)(c2);
-  return false;
+  return m;
 }
 
-bool CD_CylinderPlane(const Collider* c1, const Collider* c2)
+Manifold CD_CylinderPlane(const Collider* c1, const Collider* c2)
 {
+  Manifold m;
   CylinderCollider* a = (CylinderCollider*)(c1);
   PlaneCollider* b = (PlaneCollider*)(c2);
-  return false;
+  return m;
 }
 
-bool CD_CylinderCylinder(const Collider* c1, const Collider* c2)
+Manifold CD_CylinderCylinder(const Collider* c1, const Collider* c2)
 {
+  Manifold m;
   CylinderCollider* a = (CylinderCollider*)(c1);
   CylinderCollider* b = (CylinderCollider*)(c2);
-  return false;
+  return m;
 
 }
