@@ -62,13 +62,19 @@ int main()
 
   std::vector<Entity*> entity_list;
 
-  //entity_list.push_back(new Entity(&cube_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius))));
-  //entity_list.push_back(new Entity(&cylinder_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), new CylinderCollider(glm::vec3(-2.0f, 0.0f, 0.0f), cy_height, s_radius)));
-  //entity_list.push_back(new Entity(&plane_mesh, Transform(glm::vec3(0.0f, -3.0f, 0.0f)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), new PlaneCollider(glm::vec3(0.0f, 1.0f, 0.0f), -3.0f)));
-  entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(s_radius)));
-  entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(s_radius)));
+  unsigned test_num = 0;
 
-  //For stress test
+  //EXAMPLE ON HOW TO MAKE EACH ENTITY
+
+  entity_list.push_back(new Entity(&cube_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius))));
+  entity_list.push_back(new Entity(&cylinder_mesh, Transform(glm::vec3(0.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f), new CylinderCollider(cy_height, s_radius)));
+  entity_list.push_back(new Entity(&plane_mesh, Transform(glm::vec3(0.0f, -3.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), new PlaneCollider(glm::vec3(0.0f, 1.0f, 0.0f), -3.0f)));
+  entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), new SphereCollider(s_radius)));
+  //entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(s_radius)));
+
+
+  //FOR STRESS TEST PURPOSES
+
   /*
   for (int i = 0; i < 15; i++)
   {
@@ -78,11 +84,18 @@ int main()
       entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(-2.0f * i, 0.0f, 2.0f*j)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), new SphereCollider(glm::vec3(-1.0f, 0.0f, -1.0f), s_radius)));
     }
   }*/
+
+  //EXAMPLES ON ROTATION AND RIGIDBODIES
+
 	/*
     entity_list[0].GetTransform().GetRot() = glm::angleAxis(-counter, glm::normalize(glm::vec3(0.5f, 1.0f, 0.0f)));
     entity_list[1].GetTransform().GetRot() = glm::angleAxis(counter, glm::normalize(glm::vec3(0.5f, 1.0f, 0.0f)));
     entity_list[2].GetTransform().GetRot() = glm::angleAxis(counter, glm::normalize(glm::vec3(0.0f, 1.0f, 1.0f)));
     entity_list[0]->GetTransform().GetRot() = glm::angleAxis(sinf(counter * 0.1f), glm::normalize(glm::vec3(0.5f, 0.0f, 0.5f)));
+
+	entity_list[1]->GetCollider()->GetRigibody().GetStatic() = false;
+	entity_list[1]->GetCollider()->GetRigibody().GetDirection() = glm::vec3(0.0f, -1.0f, 0.0f);
+	entity_list[1]->GetCollider()->GetRigibody().GetSpeed() = 0.05f;
 	*/
 
   shader.Bind();
@@ -93,12 +106,7 @@ int main()
   //Frames stuff
   uint32_t current_tick = 0, last_tick = 0;
   float  dt = 0.0f;
-
-  /*
-  entity_list[1]->GetCollider()->GetRigibody().GetStatic() = false;
-  entity_list[1]->GetCollider()->GetRigibody().GetDirection() = glm::vec3(0.0f, -1.0f, 0.0f);
-  entity_list[1]->GetCollider()->GetRigibody().GetSpeed() = 0.05f;
-  */
+  float counter = 0.0f;
 
   while (!display.Closed())
   {
@@ -117,6 +125,22 @@ int main()
 
     //Updating the display
     display.SwapBuffer();
+
+	if (test_num == 1 || test_num == 2)
+	{
+		for (unsigned i = 0; i < entity_list.size(); i++)
+		{
+			if (entity_list[i]->GetCollider()->colliding)
+				entity_list[i]->GetColor() = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+			else
+				entity_list[i]->GetColor() = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+		}
+	}
+
+	if (test_num == 2)
+	{
+		entity_list[0]->GetTransform().GetRot() = glm::angleAxis(current_tick * 0.001f, glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
+	}
 
     //Check for input
     SDL_Event e;
@@ -142,14 +166,57 @@ int main()
           camera.GetPos() += -glm::cross(camera.GetForward(), camera.GetUp()) * 0.05f;
           break;
           
+		case SDLK_l:
+			if(test_num == 1 || test_num == 2)
+				entity_list[0]->GetTransform().GetPos() += glm::vec3(0.1f, 0.0f, 0.0f);
+			break;
+		case SDLK_j:
+			if(test_num == 1 || test_num == 2)
+				entity_list[0]->GetTransform().GetPos() -= glm::vec3(0.1f, 0.0f, 0.0f);
+			break;
           
-        case SDLK_l:
-          entity_list[1]->GetTransform().GetPos() += glm::vec3(0.1f,0.0f,0.0f);
-          break;
-        case SDLK_j:
-          entity_list[1]->GetTransform().GetPos() -= glm::vec3(0.1f, 0.0f, 0.0f);
-          break;
-          
+	    //DEMO CODE FOR DEMO
+		case SDLK_1:
+			for (unsigned i = 0; i < entity_list.size(); i++)
+				delete entity_list[i];
+			entity_list.clear();
+
+			entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(s_radius)));
+			entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(s_radius)));
+
+			test_num = 1;
+			break;
+
+		case SDLK_2:
+			for (unsigned i = 0; i < entity_list.size(); i++)
+				delete entity_list[i];
+			entity_list.clear();
+
+			entity_list.push_back(new Entity(&cube_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius))));
+			entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(0.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(s_radius)));
+
+			test_num = 2;
+			break;
+
+		case SDLK_3:
+			for (unsigned i = 0; i < entity_list.size(); i++)
+				delete entity_list[i];
+			entity_list.clear();
+
+
+			entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(0.0f, 4.0f, 0.0f)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), new SphereCollider(s_radius)));
+			entity_list.push_back(new Entity(&plane_mesh, Transform(glm::vec3(0.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 0.5f, 1.0f), new PlaneCollider(glm::vec3(0.0f, 1.0f, 0.0f), 0.0f)));
+			entity_list.push_back(new Entity(&plane_mesh, Transform(glm::vec3(4.0f, 0.0f, 0.0f), glm::quat(0.5f, 0.0f, 0.0f, 0.8660254f)), glm::vec4(0.0f, 0.5f, 0.0f, 1.0f), new PlaneCollider(glm::vec3(-0.866025f, -0.5f, 0.0f), 0.0f)));
+			entity_list.push_back(new Entity(&plane_mesh, Transform(glm::vec3(-4.0f, 0.0f, 0.0f), glm::quat(-0.5f, 0.0f, 0.0f, 0.8660254f)), glm::vec4(0.5f, 0.0f, 0.0f, 1.0f), new PlaneCollider(glm::vec3(0.866025f, -0.5f, 0.0f), 0.0f)));
+
+			
+			entity_list[0]->GetCollider()->GetRigibody().GetStatic() = false;
+			entity_list[0]->GetCollider()->GetRigibody().GetDirection() = glm::vec3(-0.5f, -1.0f, 0.0f);
+			entity_list[0]->GetCollider()->GetRigibody().GetSpeed() = 0.05f;
+			
+
+			test_num = 3;
+			break;
 
         case SDLK_ESCAPE:
           display.SetClosed(true);
@@ -169,6 +236,7 @@ int main()
   //delete all the data
   for (unsigned i = 0; i < entity_list.size(); i++)
     delete entity_list[i];
+  entity_list.clear();
 
   return 0;
 }

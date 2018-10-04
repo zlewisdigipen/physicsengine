@@ -41,6 +41,7 @@ Manifold CD_CylinderSphere(const Collider* a, const Collider* b);
 Manifold CD_CylinderAABB(const Collider* a, const Collider* b);
 Manifold CD_CylinderPlane(const Collider* a, const Collider* b);
 Manifold CD_CylinderCylinder(const Collider* a, const Collider* b);
+Manifold CD_PlanePlane(const Collider* a, const Collider* b);
 
 #endif // !COLLISION_DETECTION_H
 

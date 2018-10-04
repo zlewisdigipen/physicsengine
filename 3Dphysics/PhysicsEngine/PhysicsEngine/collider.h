@@ -9,7 +9,7 @@ enum ColliderType
 {
 	SphereType,
 	AABBType,
-  CylinderType,
+	CylinderType,
 	PlaneType,
 	NumberOfColliderType
 };
@@ -17,20 +17,22 @@ enum ColliderType
 class Collider
 {
 public:
-	Collider() {}
+	Collider() { colliding = false; }
 	//Collider(const ColliderType t) : type(t) {}
-  virtual ~Collider() {}
+    virtual ~Collider() {}
 
 	const ColliderType GetType() const { return type; }
-  Transform* GetTransform() { return tran; }
-  Rigibody& GetRigibody() { return rig; }
+    Transform* GetTransform() { return tran; }
+    Rigibody& GetRigibody() { return rig; }
+
+	bool colliding;
 
   virtual void UpdateCollider(Transform* t) {}
 
 protected:
 	ColliderType type;
-  Transform* tran;
-  Rigibody rig;
+    Transform* tran;
+    Rigibody rig;
 };
 
 #endif

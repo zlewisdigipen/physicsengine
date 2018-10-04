@@ -16,5 +16,6 @@ void CR_CylinderPlane(const Collider* a, const Collider* b);
 void CR_CylinderCylinder(const Collider* a, const Collider* b);
 void CR_SphereSphere(const Collider* a, const Collider* b);
 void CR_SphereAABB(const Collider* a, const Collider* b);
+void  CR_PlanePlane(const Collider* a, const Collider* b);
 
 #endif // !COLLISION_RESPONSE_H

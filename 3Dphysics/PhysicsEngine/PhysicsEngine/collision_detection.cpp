@@ -4,6 +4,7 @@
 Manifold CD_SphereSphere(const Collider* c1, const Collider* c2)
 {
   Manifold m;
+  m.contact_count = 0;
   SphereCollider* a = (SphereCollider*)(c1);
   SphereCollider* b = (SphereCollider*)(c2);
 
@@ -38,6 +39,7 @@ Manifold CD_SphereSphere(const Collider* c1, const Collider* c2)
     m.contact_count = 1;
   }
 
+  m.contact_count = 1;
   return m; //true
 }
 
@@ -45,6 +47,7 @@ Manifold CD_SphereSphere(const Collider* c1, const Collider* c2)
 Manifold CD_SphereAABB(const Collider* c1, const Collider* c2)
 {
   Manifold m;
+  m.contact_count = 0;
   SphereCollider* a = (SphereCollider*)(c1);
   AABBCollider* b = (AABBCollider*)(c2);
 
@@ -62,7 +65,7 @@ Manifold CD_SphereAABB(const Collider* c1, const Collider* c2)
       out += val * val;
     }
 
-    if (v > bmax)
+    else if (v > bmax)
     {
       float val = (v - bmax);
       out += val * val;
@@ -82,7 +85,10 @@ Manifold CD_SphereAABB(const Collider* c1, const Collider* c2)
   sq += check(rotated_a.z, b->GetMin().z, b->GetMax().z);
 
   if (sq - (a->GetRadius() * a->GetRadius()) <= 0.0f)
-    return m; //true
+  {
+	  m.contact_count = 1;
+	  return m; //true
+  }
 
   return m; //false
 }
@@ -90,7 +96,7 @@ Manifold CD_SphereAABB(const Collider* c1, const Collider* c2)
 IntersectionType PointPlane(glm::vec3 a, const PlaneCollider b, float epsilon)
 {
   //PlaneCollider plane = b.Normalized();
-  float dist = glm::dot(glm::vec3(a.x, a.y, a.z), glm::vec3(b.GetNormal().x, b.GetNormal().y, b.GetNormal().z)) - b.GetDistance();
+  float dist = glm::dot(glm::vec3(a.x, a.y, a.z), glm::vec3(b.GetNormal().x, b.GetNormal().y, b.GetNormal().z)) / glm::length(b.GetNormal());
 
   if (dist > epsilon)
     return IntersectionType::Inside;
@@ -104,14 +110,16 @@ IntersectionType PointPlane(glm::vec3 a, const PlaneCollider b, float epsilon)
 Manifold CD_SpherePlane(const Collider* c1, const Collider* c2)
 {
   Manifold m;
+  m.contact_count = 0;
   SphereCollider* a = (SphereCollider*)(c1);
   PlaneCollider* b = (PlaneCollider*)(c2);
 
-  IntersectionType t = PointPlane(a->GetTransform()->GetPos(), *b, a->GetRadius());
+  IntersectionType t = PointPlane(a->GetTransform()->GetPos() - b->GetTransform()->GetPos(), *b, a->GetRadius());
 
   if (t == IntersectionType::Coplanar)
   {
-    return m; //true
+	m.contact_count = 1;
+	return m; //true
   }
 
   return m; //false
@@ -120,6 +128,7 @@ Manifold CD_SpherePlane(const Collider* c1, const Collider* c2)
 Manifold CD_AABBPlane(const Collider* c1, const Collider* c2)
 {
   Manifold m;
+  m.contact_count = 0;
   AABBCollider* a = (AABBCollider*)(c1);
   PlaneCollider* b = (PlaneCollider*)(c2);
 
@@ -143,9 +152,12 @@ Manifold CD_AABBPlane(const Collider* c1, const Collider* c2)
   IntersectionType nearest_val = PointPlane(nearest_p, *b, 0.0f);
 
   if ((furthest_val == IntersectionType::Inside && nearest_val == IntersectionType::Outside) ||
-    (furthest_val == IntersectionType::Outside && nearest_val == IntersectionType::Inside) ||
-    furthest_val == IntersectionType::Coplanar || nearest_val == IntersectionType::Coplanar)
-    return m; //true
+	  (furthest_val == IntersectionType::Outside && nearest_val == IntersectionType::Inside) ||
+	  furthest_val == IntersectionType::Coplanar || nearest_val == IntersectionType::Coplanar)
+  {
+	  m.contact_count = 1;
+	  return m; //true
+  }
 
   return m; //false
 }
@@ -153,6 +165,7 @@ Manifold CD_AABBPlane(const Collider* c1, const Collider* c2)
 Manifold CD_AABBAABB(const Collider* c1, const Collider* c2)
 {
   Manifold m;
+  m.contact_count = 0;
   AABBCollider* a = (AABBCollider*)(c1);
   AABBCollider* b = (AABBCollider*)(c2);
 
@@ -167,12 +180,14 @@ Manifold CD_AABBAABB(const Collider* c1, const Collider* c2)
     return m; //false
   }
 
+  m.contact_count = 1;
   return m; //true
 }
 
 Manifold CD_CylinderSphere(const Collider* c1, const Collider* c2)
 {
   Manifold m;
+  m.contact_count = 0;
   CylinderCollider* a = (CylinderCollider*)(c1);
   SphereCollider* b = (SphereCollider*)(c2);
 
@@ -182,6 +197,7 @@ Manifold CD_CylinderSphere(const Collider* c1, const Collider* c2)
 Manifold CD_CylinderAABB(const Collider* c1, const Collider* c2)
 {
   Manifold m;
+  m.contact_count = 0;
   CylinderCollider* a = (CylinderCollider*)(c1);
   AABBCollider* b = (AABBCollider*)(c2);
   return m;
@@ -190,6 +206,7 @@ Manifold CD_CylinderAABB(const Collider* c1, const Collider* c2)
 Manifold CD_CylinderPlane(const Collider* c1, const Collider* c2)
 {
   Manifold m;
+  m.contact_count = 0;
   CylinderCollider* a = (CylinderCollider*)(c1);
   PlaneCollider* b = (PlaneCollider*)(c2);
   return m;
@@ -198,8 +215,23 @@ Manifold CD_CylinderPlane(const Collider* c1, const Collider* c2)
 Manifold CD_CylinderCylinder(const Collider* c1, const Collider* c2)
 {
   Manifold m;
+  m.contact_count = 0;
   CylinderCollider* a = (CylinderCollider*)(c1);
   CylinderCollider* b = (CylinderCollider*)(c2);
   return m;
 
+}
+
+Manifold CD_PlanePlane(const Collider* c1, const Collider* c2)
+{
+	Manifold m;
+	m.contact_count = 0;
+	PlaneCollider* a = (PlaneCollider*)(c1);
+	PlaneCollider* b = (PlaneCollider*)(c2);
+
+	if (a->GetNormal() == b->GetNormal() && a->GetTransform()->GetPos() != b->GetTransform()->GetPos())
+		return m;
+
+	m.contact_count = 1;
+	return m;
 }
