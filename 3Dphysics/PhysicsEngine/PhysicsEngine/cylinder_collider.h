@@ -10,6 +10,8 @@ public:
   CylinderCollider(const float h, const float r) : height(h), radius(r)
   {
     type = ColliderType::CylinderType;
+
+    rig = Rigibody();
   }
 
   const float GetRadius() const { return radius; }

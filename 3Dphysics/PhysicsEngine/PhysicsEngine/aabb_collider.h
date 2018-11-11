@@ -13,6 +13,8 @@ public:
     type = ColliderType::AABBType;
 
     half_ext = glm::abs(h_e);
+
+    rig = Rigibody();
   }
 
   glm::vec3& GetHalf() { return half_ext; }

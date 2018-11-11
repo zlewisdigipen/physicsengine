@@ -39,10 +39,27 @@ Display::Display(int width, int height, const std::string& title)
   glClearDepth(1.0f);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
+
+
+  //Initialize imgui
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+  ImGui_ImplSDL2_InitForOpenGL(wndptr, gl_context);
+  ImGui_ImplOpenGL3_Init("#version 130");
+
+  ImGui::StyleColorsDark();
 }
 
 Display::~Display()
 {
+
+  // Cleanup
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplSDL2_Shutdown();
+  ImGui::DestroyContext();
+
 	SDL_GL_DeleteContext(gl_context);
 	SDL_DestroyWindow(wndptr);
 

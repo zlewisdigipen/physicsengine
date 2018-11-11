@@ -17,11 +17,18 @@ void Physics_Update(std::vector<Entity*>& entity_list)
   for (unsigned i = 0; i < entity_list.size(); i++)
   {
     
-    if (!entity_list[i]->GetCollider()->GetRigibody().GetStatic())
+    if (!(entity_list[i]->GetCollider()->GetRigibody().GetStatic()))
     {
-      entity_list[i]->GetTransform().GetPos() += glm::normalize(entity_list[i]->GetCollider()->GetRigibody().GetDirection()) *
-                                                                entity_list[i]->GetCollider()->GetRigibody().GetSpeed();
-      //entity_list[i]->GetCollider()->GetRigibody().GetDirection() += glm::vec3(0.0f, -0.001f, 0.0f);
+      glm::vec3 norm;
+
+      //Solve for 0 vector
+      if (glm::length(entity_list[i]->GetCollider()->GetRigibody().GetDirection()) == 0.0f)
+        norm = entity_list[i]->GetCollider()->GetRigibody().GetDirection();
+      else
+       norm = glm::normalize(entity_list[i]->GetCollider()->GetRigibody().GetDirection());
+
+      entity_list[i]->GetTransform().GetPos() +=  norm * entity_list[i]->GetCollider()->GetRigibody().GetSpeed();
+      entity_list[i]->GetCollider()->GetRigibody().GetDirection() += glm::vec3(0.0f, -0.001f, 0.0f);
     }
 
    entity_list[i]->GetCollider()->UpdateCollider(&(entity_list[i])->GetTransform());

@@ -11,6 +11,8 @@ public:
 	SphereCollider(const float r): radius(r) 
   { 
     type = ColliderType::SphereType; 
+
+    rig = Rigibody();
   }
 
 	const float GetRadius() const { return radius; }

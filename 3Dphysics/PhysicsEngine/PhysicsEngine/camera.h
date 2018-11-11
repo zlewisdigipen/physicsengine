@@ -13,12 +13,13 @@ public:
 	{
 		perspective = glm::perspective(fov, aspect, zNear, zFar);
 		position = pos;
-		forward = glm::vec3(0, 0, -1.0f);
-		up = glm::vec3(0, -1.0f, 0);
+		forward = glm::vec3(0, 0, 1.0f);
+		up = glm::vec3(0, 1.0f, 0);
 		pitch = 0.0f;
 		yaw = 0.0f;
 		camera_rot = glm::quat();
 	}
+
 
 	inline glm::mat4 GetViewProjection() const
 	{
@@ -41,6 +42,8 @@ public:
 	glm::vec3& GetPos() { return position; }
   float& GetPitch() { return pitch; }
   float& GetYaw() { return yaw; }
+  glm::mat4 GetPerspective() {  return perspective; }
+  glm::mat4 GetView() { return glm::lookAt(position, position + forward, up); }
 
 private:
   glm::quat camera_rot;
