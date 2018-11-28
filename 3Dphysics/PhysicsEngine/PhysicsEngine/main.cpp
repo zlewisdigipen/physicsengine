@@ -23,12 +23,14 @@
 
 #undef main
 
-void EditTransform(const float *view, float *proj, Entity* se, ImGuizmo::OPERATION mOp, ImGuizmo::MODE mMo, int width, int height)
+bool EditTransform(const float *view, float *proj, Entity* se, ImGuizmo::OPERATION mOp, ImGuizmo::MODE mMo, int width, int height)
 {
   glm::fmat4 matrix = se->GetTransform().GetModel();
   bool t = false;
   bool r = false;
   bool s = false;
+
+  bool edited = false;
 
   //Make Gizmos
   float matrixTranslation[3], matrixRotation[3], matrixScale[3];
@@ -47,6 +49,13 @@ void EditTransform(const float *view, float *proj, Entity* se, ImGuizmo::OPERATI
   //To start manipulating the entity
   ImGuizmo::SetRect(0.0f, 0.0f, (float)width, (float)height);
   ImGuizmo::Manipulate(view, proj, mOp, mMo, &matrix[0][0]);
+
+  //Check for difference in matrix
+  for (unsigned i = 0; i < 4; i++)
+    for (unsigned j = 0; j < 4; j++)
+      if (matrix[i][j] != se->GetTransform().GetModel()[i][j])
+        edited = true;
+
   ImGuizmo::DecomposeMatrixToComponents(&matrix[0][0], matrixTranslation, matrixRotation, matrixScale);
 
   //Set transform
@@ -58,6 +67,8 @@ void EditTransform(const float *view, float *proj, Entity* se, ImGuizmo::OPERATI
 
   if (s || mOp == ImGuizmo::SCALE)
     se->GetTransform().SetScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
+
+  return t || s || r || edited;
 }
 
 void OnExit()
@@ -112,7 +123,6 @@ int main()
   entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), new SphereCollider(s_radius)));
   //entity_list.push_back(new Entity(&sphere_mesh, Transform(glm::vec3(-2.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new SphereCollider(s_radius)));
   */
-
 
   //FOR STRESS TEST PURPOSES
 
@@ -225,8 +235,10 @@ int main()
   ImGuizmo::MODE mMo(ImGuizmo::LOCAL);          //Which space are we editing the entities
   bool selected = false;                        //Check if there is a selected object in list box to spawn gizmos
   int s_entity = 0;                             //Index to which entity being used
+  bool gravity = true;
 
-  //std::vector<std::vector<
+  std::vector<std::vector<Transform>> time_tool;
+  ImU32 time_index = 0;
 
   //Set Vsync
   SDL_GL_SetSwapInterval(1);
@@ -291,6 +303,8 @@ int main()
               selected = false;
               delete entity_list[s_entity];
               entity_list.erase(entity_list.begin() + s_entity);
+              time_tool[s_entity].clear();
+              time_tool.erase(time_tool.begin() + s_entity);
             }
             break;
 
@@ -344,7 +358,22 @@ int main()
 
       //Imgui window logic
       if (ImGui::Button("Pause"))
+      {
+        //return all objects back to normal because of time tool
+        if (pause_physics)
+        {
+          for (unsigned i = 0; i < entity_list.size(); i++)
+          {
+            entity_list[i]->GetTransform() = time_tool[i][time_tool[i].size() - 1];
+            time_index = time_tool[i].size() - 1;
+          }
+        }
+
         pause_physics = !pause_physics;
+      }
+
+      if (ImGui::Button("Gravity"))
+        gravity = !gravity;
 
       std::string fps = "FPS: " + std::to_string((int)dt);
       ImGui::Text(fps.c_str());
@@ -367,6 +396,9 @@ int main()
         {
           entity_list.push_back(new Entity(&cube_mesh, Transform(), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), new AABBCollider(glm::vec3(c_radius, c_radius, c_radius))));
           names.push_back("Object " + std::to_string(names.size() + 1));
+          std::vector<Transform> temp;
+          temp.push_back(entity_list[entity_list.size() - 1]->GetTransform());
+          time_tool.push_back(temp);
         }
 
         //Adding sphere
@@ -374,6 +406,9 @@ int main()
         {
           entity_list.push_back(new Entity(&sphere_mesh, Transform(), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), new SphereCollider(s_radius)));
           names.push_back("Object " + std::to_string(names.size() + 1));
+          std::vector<Transform> temp;
+          temp.push_back(entity_list[entity_list.size() - 1]->GetTransform());
+          time_tool.push_back(temp);
         }
 
         //Adding cylinder
@@ -381,6 +416,9 @@ int main()
         {
           entity_list.push_back(new Entity(&cylinder_mesh, Transform(), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), new CylinderCollider(cy_height, s_radius)));
           names.push_back("Object " + std::to_string(names.size() + 1));
+          std::vector<Transform> temp;
+          temp.push_back(entity_list[entity_list.size() - 1]->GetTransform());
+          time_tool.push_back(temp);
         }
 
         //Adding plane
@@ -388,6 +426,46 @@ int main()
         {
           entity_list.push_back(new Entity(&plane_mesh, Transform(), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), new PlaneCollider(glm::vec3(0.0f, 1.0f, 0.0f), -3.0f)));
           names.push_back("Object " + std::to_string(names.size() + 1));
+          std::vector<Transform> temp;
+          temp.push_back(entity_list[entity_list.size() - 1]->GetTransform());
+          time_tool.push_back(temp);
+        }
+      }
+
+      //Reverse time tool
+      ImU32 min = 0, max = 0;
+
+      for (unsigned i = 0; i < entity_list.size(); i++)
+        if (max < time_tool[i].size() - 1)
+          max = time_tool[i].size() - 1;
+
+      ImGui::SliderScalar("Time Tool", ImGuiDataType_U32, &time_index, &min, &max);
+
+      //Set the position of the transforms
+      for (unsigned i = 0; i < entity_list.size(); i++)
+      {
+        if (time_tool[i].size() - 1  < max)
+        {
+          int a = max - (time_tool[i].size() - 1);
+          if ((int)time_index - a < 0)
+          {
+            entity_list[i]->GetTransform().SetPos(time_tool[i][0].GetPos());
+            entity_list[i]->GetTransform().SetRot(time_tool[i][0].GetRot());
+            entity_list[i]->GetTransform().SetScale(time_tool[i][0].GetScale());
+          }
+          else
+          {
+            entity_list[i]->GetTransform().SetPos(time_tool[i][time_index - a].GetPos());
+            entity_list[i]->GetTransform().SetRot(time_tool[i][time_index - a].GetRot());
+            entity_list[i]->GetTransform().SetScale(time_tool[i][time_index - a].GetScale());
+          }
+        }
+        else
+        {
+          entity_list[i]->GetTransform().SetPos(time_tool[i][time_index].GetPos());
+          entity_list[i]->GetTransform().SetRot(time_tool[i][time_index].GetRot());
+          entity_list[i]->GetTransform().SetScale(time_tool[i][time_index].GetScale());
+
         }
       }
 
@@ -423,7 +501,12 @@ int main()
           names[s_entity] = n;
         ImGui::PopID();
 
-        EditTransform(&view[0][0], &projection[0][0], se, mOp, mMo, display.GetWidth(), display.GetHeight());
+        //To clear the time table when item is edited
+        if (EditTransform(&view[0][0], &projection[0][0], se, mOp, mMo, display.GetWidth(), display.GetHeight()))
+        {
+          time_tool[s_entity].clear();
+          time_tool[s_entity].push_back(se->GetTransform());
+        }
 
         //Rigidbody stuff
         ImGui::PushID(2);
@@ -439,7 +522,6 @@ int main()
         ImGui::PopID();
         
         ImGui::End();
-        //delete[] n;
       }
 
       delete[] arr;
@@ -449,11 +531,35 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Clear frame
     display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
-
-    if(!pause_physics)
-      Physics_Update(entity_list);
-
     Graphics_Update(entity_list, camera, shader);
+
+    if (!pause_physics)
+    {
+      for (unsigned i = 0; i < entity_list.size(); i++)
+      {
+        if (time_tool[i].size() > 600)
+          time_tool[i].erase(time_tool[i].begin());
+
+        time_tool[i].push_back(entity_list[i]->GetTransform());
+        time_index = time_tool[i].size() - 1;
+      }
+
+      /*Debug for mesh
+      for (unsigned i = 0; i < entity_list.size(); i++)
+      {
+        for (unsigned j = 0; j < entity_list[i]->GetTransform().GetPoints().size(); j++)
+        {
+          std::cout << "Point " << j << ": " <<  entity_list[i]->GetTransform().GetPoints()[j].x << ", "
+            <<  entity_list[i]->GetTransform().GetPoints()[j].y << ", "
+            <<  entity_list[i]->GetTransform().GetPoints()[j].z << std::endl;
+        }
+        std::cout << std::endl;
+      }*/
+
+      Physics_Update(entity_list, gravity);
+
+    }
+
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     //Updating the display

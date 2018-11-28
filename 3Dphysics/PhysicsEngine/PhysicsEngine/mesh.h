@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 #include <GL/glew.h>
+#include <vector>
 
 class Vertex
 {
@@ -33,6 +34,7 @@ public:
 	~Mesh();
 
 	void Draw();
+  std::vector<glm::vec3> GetShape() { return shape_points; }
 
 private:
 
@@ -44,6 +46,7 @@ private:
 		NUM_BUFFERS
 	};
 
+  std::vector<glm::vec3> shape_points;
 	GLuint vertex_objs;
 	GLuint vertex_buff[NUM_BUFFERS];
 	unsigned int draw_count;

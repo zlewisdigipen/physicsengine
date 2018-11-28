@@ -1,23 +1,15 @@
 #include "physics.h"
+#include "EPA.h"
 #include <iostream>
 
-DetectionType detection_lookup[ColliderType::NumberOfColliderType][ColliderType::NumberOfColliderType] = {{ CD_SphereSphere,   CD_SphereAABB,   CD_CylinderSphere,   CD_SpherePlane },
-                                                                                                          { CD_SphereAABB,     CD_AABBAABB,     CD_CylinderAABB,     CD_AABBPlane },
-                                                                                                          { CD_CylinderSphere, CD_CylinderAABB, CD_CylinderCylinder, CD_CylinderPlane},
-                                                                                                          { CD_SpherePlane,    CD_AABBPlane,    CD_CylinderPlane,    CD_PlanePlane }};
-
-ResponseType response_lookup[ColliderType::NumberOfColliderType][ColliderType::NumberOfColliderType] = { { CR_SphereSphere,   CR_SphereAABB,   CR_CylinderSphere,   CR_SpherePlane },
-                                                                                                         { CR_SphereAABB,     CR_AABBAABB,     CR_CylinderAABB,     CR_AABBPlane },
-                                                                                                         { CR_CylinderSphere, CR_CylinderAABB, CR_CylinderCylinder, CR_CylinderPlane },
-                                                                                                         { CR_SpherePlane,    CR_AABBPlane,    CR_CylinderPlane,    CR_PlanePlane} };
-
-void Physics_Update(std::vector<Entity*>& entity_list)
+void Physics_Update(std::vector<Entity*>& entity_list, bool gravity
+)
 {
   //Update colliders here
   for (unsigned i = 0; i < entity_list.size(); i++)
   {
-    
-    if (!(entity_list[i]->GetCollider()->GetRigibody().GetStatic()))
+    //Gravity
+    if (gravity && !(entity_list[i]->GetCollider()->GetRigibody().GetStatic()))
     {
       glm::vec3 norm;
 
@@ -25,7 +17,7 @@ void Physics_Update(std::vector<Entity*>& entity_list)
       if (glm::length(entity_list[i]->GetCollider()->GetRigibody().GetDirection()) == 0.0f)
         norm = entity_list[i]->GetCollider()->GetRigibody().GetDirection();
       else
-       norm = glm::normalize(entity_list[i]->GetCollider()->GetRigibody().GetDirection());
+        norm = glm::normalize(entity_list[i]->GetCollider()->GetRigibody().GetDirection());
 
       entity_list[i]->GetTransform().GetPos() +=  norm * entity_list[i]->GetCollider()->GetRigibody().GetSpeed();
       entity_list[i]->GetCollider()->GetRigibody().GetDirection() += glm::vec3(0.0f, -0.001f, 0.0f);
@@ -37,6 +29,7 @@ void Physics_Update(std::vector<Entity*>& entity_list)
   std::vector<Manifold> manifolds;
 
   //Collision Detection and update colliders
+  /*
   for (unsigned i = 0; i < entity_list.size(); i++)
   {
     for (unsigned j = i + 1; j < entity_list.size(); j++)
@@ -53,14 +46,14 @@ void Physics_Update(std::vector<Entity*>& entity_list)
           manifolds.push_back(m);
           response_lookup[c1->GetType()][c2->GetType()](c1, c2);
 
-		  (*entity_list[i]).GetCollider()->colliding = true;
-		  (*entity_list[j]).GetCollider()->colliding = true;
+          (*entity_list[i]).GetCollider()->colliding = true;
+          (*entity_list[j]).GetCollider()->colliding = true;
         }
-		else
-		{
-			(*entity_list[i]).GetCollider()->colliding = false;
-			(*entity_list[j]).GetCollider()->colliding = false;
-		}
+        else
+        {
+          (*entity_list[i]).GetCollider()->colliding = false;
+          (*entity_list[j]).GetCollider()->colliding = false;
+        }
       }
       else
       {
@@ -71,19 +64,70 @@ void Physics_Update(std::vector<Entity*>& entity_list)
           manifolds.push_back(m);
           response_lookup[c1->GetType()][c2->GetType()](c2, c1);
 
-		  (*entity_list[i]).GetCollider()->colliding = true;
-		  (*entity_list[j]).GetCollider()->colliding = true;
-		}
-		else
-		{
-			(*entity_list[i]).GetCollider()->colliding = false;
-			(*entity_list[j]).GetCollider()->colliding = false;
-		}
+          (*entity_list[i]).GetCollider()->colliding = true;
+          (*entity_list[j]).GetCollider()->colliding = true;
+        }
+        else
+        {
+          (*entity_list[i]).GetCollider()->colliding = false;
+          (*entity_list[j]).GetCollider()->colliding = false;
+        }
+      }
+    }
+  }*/
+
+  //GJK Collision Detection
+  //n^2 check << change it
+  for (unsigned i = 0; i < entity_list.size(); i++)
+  {
+    for (unsigned j = i + 1; j < entity_list.size(); j++)
+    {
+      //if they are both static don't do gjk
+      if (entity_list[i]->GetCollider()->GetRigibody().GetStatic() && entity_list[j]->GetCollider()->GetRigibody().GetStatic())
+        continue;
+
+      glm::vec3 dir = entity_list[i]->GetTransform().GetPos() - entity_list[j]->GetTransform().GetPos();
+      std::vector<glm::vec3> poly;
+
+      if (GJK_Intersection(entity_list[i]->GetTransform().GetPoints(), entity_list[j]->GetTransform().GetPoints(), dir, poly))
+      {
+        //Do EPA here
+        glm::vec3 p = EPA(entity_list[i]->GetTransform().GetPoints(), entity_list[i]->GetTransform().GetPoints(), poly);
+
+
+        //Add Manifolds which hold epa information and more
+        Manifold m;
+        m.e1 = i;
+        m.e2 = j;
+        m.poly = poly;
+        m.pen = p;
+
+        manifolds.push_back(m);
+      }
+      else
+      {
+        entity_list[i]->GetColor() = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+        entity_list[j]->GetColor() = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
       }
     }
   }
 
   //Last loop for manifold resolutions
+  
+  //This if to check if colliding
+  for (unsigned i = 0; i < manifolds.size(); i++)
+  {
+    Entity* e1 = entity_list[manifolds[i].e1];
+    Entity* e2 = entity_list[manifolds[i].e2];
+
+    if (e1->GetCollider()->GetRigibody().GetStatic())
+      e2->GetTransform().GetPos() += manifolds[i].pen;
+    else if (e2->GetCollider()->GetRigibody().GetStatic())
+      e1->GetTransform().GetPos() += manifolds[i].pen;
+
+    e1->GetColor() = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    e2->GetColor() = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+  }
 
   manifolds.clear();
 }

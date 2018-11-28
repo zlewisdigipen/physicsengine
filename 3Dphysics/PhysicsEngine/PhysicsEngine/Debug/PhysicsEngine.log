@@ -1,11 +1,7 @@
-﻿  collision_detection.cpp
+﻿  EPA.cpp
+c:\users\brandonhare\desktop\zach\physicsengine\3dphysics\physicsengine\physicsengine\epa.cpp(40): warning C4018: '<': signed/unsigned mismatch
   Generating Code...
-  Compiling...
+  Skipping... (no relevant changes detected)
   physics.cpp
-  main.cpp
-c:\users\brandonhare\desktop\zach\physicsengine\3dphysics\physicsengine\physicsengine\main.cpp(65): warning C4996: 'freopen': This function or variable may be unsafe. Consider using freopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.10240.0\ucrt\stdio.h(240): note: see declaration of 'freopen'
-  collision_response.cpp
-  Generating Code...
   PhysicsEngine.vcxproj -> C:\Users\brandonhare\Desktop\Zach\physicsengine\3Dphysics\PhysicsEngine\Debug\PhysicsEngine.exe
   PhysicsEngine.vcxproj -> C:\Users\brandonhare\Desktop\Zach\physicsengine\3Dphysics\PhysicsEngine\Debug\PhysicsEngine.pdb (Full PDB)

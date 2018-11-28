@@ -9,16 +9,14 @@ Mesh::Mesh(Vertex* verts, unsigned int num_verts, unsigned int* indices, unsigne
 	glGenVertexArrays(1, &vertex_objs);
 	glBindVertexArray(vertex_objs);
 
-	std::vector<glm::vec3> positions;
+  shape_points.reserve(num_verts);
 
-	positions.reserve(num_verts);
-
-	for (unsigned int i = 0; i < num_verts; i++)
-		positions.push_back(*verts[i].GetPos());
+  for (unsigned int i = 0; i < num_verts; i++)
+    shape_points.push_back(*verts[i].GetPos());
 
 	glGenBuffers(NUM_BUFFERS, vertex_buff);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buff[POSITION_VB]);
-	glBufferData(GL_ARRAY_BUFFER, num_verts * sizeof(positions[0]), &positions[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, num_verts * sizeof(shape_points[0]), &shape_points[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);

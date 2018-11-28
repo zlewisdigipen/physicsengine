@@ -145,9 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="collision_detection.cpp" />
-    <ClCompile Include="collision_response.cpp" />
+    <ClCompile Include="BarycentricCoordinates.cpp" />
     <ClCompile Include="display.cpp" />
+    <ClCompile Include="EPA.cpp" />
+    <ClCompile Include="GJK.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
     <ClCompile Include="include\imgui\ImGuizmo.cpp" />
@@ -162,10 +163,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aabb_collider.h" />
+    <ClInclude Include="BarycentricCoordinates.h" />
     <ClInclude Include="collider.h" />
-    <ClInclude Include="collision_detection.h" />
-    <ClInclude Include="collision_response.h" />
     <ClInclude Include="cylinder_collider.h" />
+    <ClInclude Include="EPA.h" />
+    <ClInclude Include="GJK.h" />
     <ClInclude Include="physics.h" />
     <ClInclude Include="rigidbody.h" />
     <ClInclude Include="sphere_collider.h" />
