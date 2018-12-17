@@ -22,6 +22,12 @@
     <Filter Include="Source Files\imgui">
       <UniqueIdentifier>{07a603b4-efce-46eb-8d14-6f8c552a5db4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\soil">
+      <UniqueIdentifier>{d70001c2-eb41-4216-b4b3-d9abd3924c7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\soil">
+      <UniqueIdentifier>{268b3480-b927-4236-8cfb-80434d272a9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,6 +74,21 @@
     </ClCompile>
     <ClCompile Include="EPA.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SAT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOIL.c">
+      <Filter>Source Files\soil</Filter>
+    </ClCompile>
+    <ClCompile Include="soil\stb_image_aug.c">
+      <Filter>Source Files\soil</Filter>
+    </ClCompile>
+    <ClCompile Include="soil\image_DXT.c">
+      <Filter>Source Files\soil</Filter>
+    </ClCompile>
+    <ClCompile Include="soil\image_helper.c">
+      <Filter>Source Files\soil</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +154,27 @@
     </ClInclude>
     <ClInclude Include="EPA.h">
       <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="SAT.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="soil\stbi_DDS_aug_c.h">
+      <Filter>Header Files\Graphics\soil</Filter>
+    </ClInclude>
+    <ClInclude Include="soil\stb_image_aug.h">
+      <Filter>Header Files\Graphics\soil</Filter>
+    </ClInclude>
+    <ClInclude Include="soil\stbi_DDS_aug.h">
+      <Filter>Header Files\Graphics\soil</Filter>
+    </ClInclude>
+    <ClInclude Include="SOIL.h">
+      <Filter>Header Files\Graphics\soil</Filter>
+    </ClInclude>
+    <ClInclude Include="soil\image_helper.h">
+      <Filter>Header Files\Graphics\soil</Filter>
+    </ClInclude>
+    <ClInclude Include="soil\image_DXT.h">
+      <Filter>Header Files\Graphics\soil</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

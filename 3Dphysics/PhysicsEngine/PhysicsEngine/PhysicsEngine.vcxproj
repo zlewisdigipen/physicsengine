@@ -159,7 +159,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="physics.cpp" />
+    <ClCompile Include="SAT.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="SOIL.c" />
+    <ClCompile Include="soil\image_DXT.c" />
+    <ClCompile Include="soil\image_helper.c" />
+    <ClCompile Include="soil\stb_image_aug.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aabb_collider.h" />
@@ -170,6 +175,13 @@
     <ClInclude Include="GJK.h" />
     <ClInclude Include="physics.h" />
     <ClInclude Include="rigidbody.h" />
+    <ClInclude Include="SAT.h" />
+    <ClInclude Include="SOIL.h" />
+    <ClInclude Include="soil\image_DXT.h" />
+    <ClInclude Include="soil\image_helper.h" />
+    <ClInclude Include="soil\stbi_DDS_aug.h" />
+    <ClInclude Include="soil\stbi_DDS_aug_c.h" />
+    <ClInclude Include="soil\stb_image_aug.h" />
     <ClInclude Include="sphere_collider.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="sphere.h" />

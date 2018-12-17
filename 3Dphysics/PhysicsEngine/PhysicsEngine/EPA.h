@@ -17,6 +17,8 @@ typedef struct Triangle
     points[1] = _b;
     points[2] = _c;
     crs = glm::cross(_b - _a, _c - _a);
+    if (glm::length(crs) != 0.0f)
+      crs = glm::normalize(crs);
   }
 }Triangle;
 
@@ -31,7 +33,13 @@ typedef struct Edge
   }
 }Edge;
 
-glm::vec3 EPA(const std::vector<glm::vec3>& shape_a, const std::vector<glm::vec3>& shape_b, std::vector<glm::vec3>& poly);
+typedef struct Penetration
+{
+  glm::vec3 normal;
+  float depth;
+}Penatration;
+
+Penatration EPA(const std::vector<glm::vec3>& shape_a, const std::vector<glm::vec3>& shape_b, std::vector<glm::vec3>& poly);
 
 
 #endif // EPA_H

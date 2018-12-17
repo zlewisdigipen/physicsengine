@@ -1,7 +1,2 @@
-﻿  EPA.cpp
-c:\users\brandonhare\desktop\zach\physicsengine\3dphysics\physicsengine\physicsengine\epa.cpp(40): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  physics.cpp
-  PhysicsEngine.vcxproj -> C:\Users\brandonhare\Desktop\Zach\physicsengine\3Dphysics\PhysicsEngine\Debug\PhysicsEngine.exe
+﻿  PhysicsEngine.vcxproj -> C:\Users\brandonhare\Desktop\Zach\physicsengine\3Dphysics\PhysicsEngine\Debug\PhysicsEngine.exe
   PhysicsEngine.vcxproj -> C:\Users\brandonhare\Desktop\Zach\physicsengine\3Dphysics\PhysicsEngine\Debug\PhysicsEngine.pdb (Full PDB)

@@ -28,7 +28,7 @@ void Simplex3(std::vector<glm::vec3>& simplex, glm::vec3& dir)
   glm::vec3 ao = -simplex[2];
 
   //Closest edge is AB
-  if (glm::dot(glm::cross(ab, abc), ao) > 0) 
+  if (glm::dot(glm::cross(ab, abc), ao) > 0)
   {
     //Get rid of C
     simplex.erase(simplex.begin());
@@ -37,8 +37,8 @@ void Simplex3(std::vector<glm::vec3>& simplex, glm::vec3& dir)
   }
 
   //Closest to edge AC
-  if (glm::dot(glm::cross(abc, ac), ao) > 0) 
-  { 
+  if (glm::dot(glm::cross(abc, ac), ao) > 0)
+  {
     //Get rid of B
     simplex.erase(simplex.begin() + 1);
     dir = glm::cross(glm::cross(ac, ao), ac);
@@ -46,8 +46,8 @@ void Simplex3(std::vector<glm::vec3>& simplex, glm::vec3& dir)
   }
 
   //Above triangle
-  if (glm::dot(abc, ao) > 0) 
-  { 
+  if (glm::dot(abc, ao) > 0)
+  {
     //simp_dim = 3;
     dir = abc;
   }
@@ -122,6 +122,7 @@ bool ContainsOrigin(std::vector<glm::vec3>& simplex, glm::vec3& dir)
   return false;
 }
 
+/*
 glm::vec3 FarthestPoint(const std::vector<glm::vec3>& shape, const glm::vec3& direction)
 {
   float furthest = glm::dot(shape[0], direction);
@@ -149,7 +150,7 @@ bool GJK_Intersection(const std::vector<glm::vec3>& shape_a, const std::vector<g
   direction = -a;
 
   //Finding collision
-  while (1)
+  for(unsigned iterations = 0; iterations < 64; iterations++)
   {
     a = FarthestPoint(shape_a, direction) - FarthestPoint(shape_b, -direction);
 
@@ -164,5 +165,6 @@ bool GJK_Intersection(const std::vector<glm::vec3>& shape_a, const std::vector<g
       return true;
   }
 
-  return true;
+  return false;
 }
+*/

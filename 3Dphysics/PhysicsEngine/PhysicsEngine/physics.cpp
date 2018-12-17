@@ -1,5 +1,4 @@
 #include "physics.h"
-#include "EPA.h"
 #include <iostream>
 
 void Physics_Update(std::vector<Entity*>& entity_list, bool gravity
@@ -88,19 +87,22 @@ void Physics_Update(std::vector<Entity*>& entity_list, bool gravity
 
       glm::vec3 dir = entity_list[i]->GetTransform().GetPos() - entity_list[j]->GetTransform().GetPos();
       std::vector<glm::vec3> poly;
+      glm::vec3 normal;
 
-      if (GJK_Intersection(entity_list[i]->GetTransform().GetPoints(), entity_list[j]->GetTransform().GetPoints(), dir, poly))
+      //GJK_Intersection(entity_list[i]->GetTransform().GetPoints(), entity_list[j]->GetTransform().GetPoints(), dir, poly)
+
+      //SAT here
+      if (OverLap(entity_list[i]->GetTransform().GetPoints(), entity_list[j]->GetTransform().GetPoints(), normal))
       {
-        //Do EPA here
-        glm::vec3 p = EPA(entity_list[i]->GetTransform().GetPoints(), entity_list[i]->GetTransform().GetPoints(), poly);
 
+        Manifold m;
+        //Do EPA here
+        //m.pen = EPA(entity_list[i]->GetTransform().GetPoints(), entity_list[i]->GetTransform().GetPoints(), poly);
 
         //Add Manifolds which hold epa information and more
-        Manifold m;
+        m.normal = normal;
         m.e1 = i;
         m.e2 = j;
-        m.poly = poly;
-        m.pen = p;
 
         manifolds.push_back(m);
       }
@@ -121,9 +123,16 @@ void Physics_Update(std::vector<Entity*>& entity_list, bool gravity
     Entity* e2 = entity_list[manifolds[i].e2];
 
     if (e1->GetCollider()->GetRigibody().GetStatic())
-      e2->GetTransform().GetPos() += manifolds[i].pen;
+      e2->GetTransform().GetPos() -= manifolds[i].normal/10.0f;
     else if (e2->GetCollider()->GetRigibody().GetStatic())
-      e1->GetTransform().GetPos() += manifolds[i].pen;
+      e1->GetTransform().GetPos() -= manifolds[i].normal/10.0f;
+    else
+    {
+
+      e2->GetTransform().GetPos() += manifolds[i].normal/40.0f;
+      e1->GetTransform().GetPos() -= manifolds[i].normal/40.0f;
+
+    }
 
     e1->GetColor() = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     e2->GetColor() = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);

@@ -20,8 +20,10 @@
 #include "physics.h"
 #include <imgui/ImGuizmo.h>
 #include <time.h>
+#include "soil\SOIL.h"
 
 #undef main
+#define LOGO "images/digipen_logo.png"
 
 bool EditTransform(const float *view, float *proj, Entity* se, ImGuizmo::OPERATION mOp, ImGuizmo::MODE mMo, int width, int height)
 {
@@ -106,13 +108,17 @@ int main()
   Shader shader("./res/basicShader");
   Mesh sphere_mesh(&(s.GetVertices()[0]), s.GetVertices().size(), &(s.GetIndices()[0]), s.GetIndices().size());
   Mesh cube_mesh(&(c.GetVertices()[0]), c.GetVertices().size(), cube_ind, sizeof(cube_ind) / sizeof(cube_ind[0]));
-  Mesh cylinder_mesh(&(cy.GetVertices()[0]), cy.GetVertices().size(), &(cy.GetIndices()[0]), cy.GetIndices().size());
+  //Mesh cylinder_mesh(&(cy.GetVertices()[0]), cy.GetVertices().size(), &(cy.GetIndices()[0]), cy.GetIndices().size());
   Mesh plane_mesh(&(p.GetVertices()[0]), p.GetVertices().size(), &(p.GetIndices()[0]), p.GetIndices().size());
 
   std::vector<Entity*> entity_list;
   std::vector<std::string> names;
 
   unsigned test_num = 0;
+
+  //LOAD LOGO
+  int logo_w, logo_h, channel;
+  unsigned char* logo = SOIL_load_image(LOGO, &logo_w, &logo_h, &channel, SOIL_LOAD_RGBA);
 
   //EXAMPLE ON HOW TO MAKE EACH ENTITY
 
@@ -236,9 +242,21 @@ int main()
   bool selected = false;                        //Check if there is a selected object in list box to spawn gizmos
   int s_entity = 0;                             //Index to which entity being used
   bool gravity = true;
+  bool credits = false;
 
   std::vector<std::vector<Transform>> time_tool;
   ImU32 time_index = 0;
+
+  //Get Texture
+  glEnable(GL_TEXTURE_2D);
+  unsigned tex_id;
+  glGenTextures(1, &tex_id);
+  glBindTexture(GL_TEXTURE_2D, tex_id);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, logo_w, logo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, logo);
+  if (glGetError() != GL_NO_ERROR)
+    std::cout << "Error loading Image";
 
   //Set Vsync
   SDL_GL_SetSwapInterval(1);
@@ -305,6 +323,11 @@ int main()
               entity_list.erase(entity_list.begin() + s_entity);
               time_tool[s_entity].clear();
               time_tool.erase(time_tool.begin() + s_entity);
+
+              time_index = 0;
+              for (unsigned i = 0; i < entity_list.size(); i++)
+                if (time_index < time_tool[i].size() - 1)
+                  time_index = time_tool[i].size() - 1;
             }
             break;
 
@@ -375,10 +398,30 @@ int main()
       if (ImGui::Button("Gravity"))
         gravity = !gravity;
 
+      if (ImGui::Button("Credits"))
+        credits = !credits;
+
       std::string fps = "FPS: " + std::to_string((int)dt);
       ImGui::Text(fps.c_str());
       ImGui::PlotLines("", &dt_holder[0], dt_holder.size(), 0, nullptr, 0.0f, 80.0f, ImVec2(0, 40));
 
+      ImGui::End();
+    }
+
+    //Makes a credit window that displays the logo
+    if (credits)
+    {
+      ImGui::Begin("Credits");
+      ImGui::Image((void*)(intptr_t)tex_id, ImVec2(logo_w/2, logo_h/2));
+      ImGui::Text("c 2018 DigiPen, All Rights Reserved.");
+      ImGui::Text("Created by Zachery Lewis");
+      ImGui::Text("Libaries Used:");
+      ImGui::Text("OpenGL");
+      ImGui::Text("SDL");
+      ImGui::Text("GLM");
+      ImGui::Text("SOIL");
+      ImGui::Text("ImGUI");
+      ImGui::Text("ImGUIzmo");
       ImGui::End();
     }
 
@@ -411,6 +454,7 @@ int main()
           time_tool.push_back(temp);
         }
 
+        /*
         //Adding cylinder
         if (ImGui::Button("Cylinder"))
         {
@@ -419,7 +463,7 @@ int main()
           std::vector<Transform> temp;
           temp.push_back(entity_list[entity_list.size() - 1]->GetTransform());
           time_tool.push_back(temp);
-        }
+        }*/
 
         //Adding plane
         if (ImGui::Button("Plane"))
@@ -447,7 +491,7 @@ int main()
         if (time_tool[i].size() - 1  < max)
         {
           int a = max - (time_tool[i].size() - 1);
-          if ((int)time_index - a < 0)
+          if (time_index < a)
           {
             entity_list[i]->GetTransform().SetPos(time_tool[i][0].GetPos());
             entity_list[i]->GetTransform().SetRot(time_tool[i][0].GetRot());
@@ -506,6 +550,11 @@ int main()
         {
           time_tool[s_entity].clear();
           time_tool[s_entity].push_back(se->GetTransform());
+
+          time_index = 0;
+          for (unsigned i = 0; i < entity_list.size(); i++)
+            if (time_index < time_tool[i].size() - 1)
+              time_index = time_tool[i].size() - 1;
         }
 
         //Rigidbody stuff

@@ -4,7 +4,9 @@
 
 #include "entity.h"
 #include <vector>
-#include "GJK.h"
+//#include "GJK.h"
+//#include "EPA.h"
+#include "SAT.h"
 #include "sphere_collider.h"
 #include "aabb_collider.h"
 #include "plane_collider.h"
@@ -14,8 +16,8 @@ typedef struct
 {
   unsigned e1;
   unsigned e2;
-  std::vector<glm::vec3> poly;
-  glm::vec3 pen;
+  //Penatration pen;
+  glm::vec3 normal;
 
 }Manifold;
 
